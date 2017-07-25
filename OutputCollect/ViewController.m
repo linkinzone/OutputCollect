@@ -60,13 +60,12 @@
             legend.orientEqual(PYOrientVertical);
             legend.itemWidthEqual(@10);
         }])
-        .gridEqual([PYGrid initPYGridWithBlock:^(PYGrid *grid) {
-            grid.xEqual(@40).x2Equal(@80).yEqual(@50);
-        }])
-        .calculableEqual(NO)
         .addXAxis([PYAxis initPYAxisWithBlock:^(PYAxis *axis) {
-            axis.typeEqual(PYAxisTypeCategory).boundaryGapEqual(@YES)
-            .addDataArr(@[@"07-21",@"07-22",@"07-23",@"07-24"]);
+            axis.typeEqual(PYAxisTypeCategory)
+            .boundaryGapEqual(@YES)
+            .addDataArr(@[@"07-21",@"07-22",@"07-23",@"07-24"])
+            .axisLine.lineStyle.widthEqual(@1.5);
+            axis.splitLine.showEqual(NO);
         }])
         .addYAxis([PYAxis initPYAxisWithBlock:^(PYAxis *axis) {
             axis.typeEqual(PYAxisTypeValue).boundaryGapEqual(@NO)
@@ -74,8 +73,8 @@
             .maxEqual(@100.0)
             .axisLabelEqual([PYAxisLabel initPYAxisLabelWithBlock:^(PYAxisLabel *axisLabel) {
                 axisLabel.formatterEqual(@"{value} %");
-            }]);
-            
+            }])
+            .axisLine.lineStyle.widthEqual(@1.5);
         }])
         .addSeries([PYCartesianSeries initPYCartesianSeriesWithBlock:^(PYCartesianSeries *series) {
             series.stackEqual(@"总量")
