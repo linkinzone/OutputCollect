@@ -13,40 +13,6 @@
 #import "PYJsonUtil.h"
 #import "PYLoadingOption.h"
 
-PYEchartsViewImageType const PYEchartsViewImageTypeJEPG = @"jpeg";
-PYEchartsViewImageType const PYEchartsViewImageTypePNG = @"png";
-
-PYEchartAction const PYEchartActionResize          = @"resize";
-PYEchartAction const PYEchartActionClick           = @"click";
-PYEchartAction const PYEchartActionDbClick         = @"dblclick";
-PYEchartAction const PYEchartActionDataChanged     = @"dataChanged";
-PYEchartAction const PYEchartActionDataZoom        = @"dataZoom";
-PYEchartAction const PYEchartActionDataRange       = @"dataRange";
-PYEchartAction const PYEchartActionLegendSelected  = @"legendSelected";
-PYEchartAction const PYEchartActionMapSelected     = @"mapSelected";
-PYEchartAction const PYEchartActionPieSelected     = @"pieSelected";
-PYEchartAction const PYEchartActionMagicTypeChange = @"magicTypeChanged";
-PYEchartAction const PYEchartActionDataViewChanged = @"dataViewChanged";
-PYEchartAction const PYEchartActionTimelineChanged = @"timelineChanged";
-PYEchartAction const PYEchartActionMapRoam         = @"mapRoam";
-
-PYEchartTheme const PYEchartThemeMacarons    = @"macarons";
-PYEchartTheme const PYEchartThemeInfographic = @"infographic";
-PYEchartTheme const PYEchartThemeShine       = @"shine";
-PYEchartTheme const PYEchartThemeDark        = @"dark";
-PYEchartTheme const PYEchartThemeBlue        = @"blue";
-PYEchartTheme const PYEchartThemeGreen       = @"green";
-PYEchartTheme const PYEchartThemeRed         = @"red";
-PYEchartTheme const PYEchartThemeGray        = @"gray";
-PYEchartTheme const PYEchartThemeHelianthus  = @"helianthus";
-PYEchartTheme const PYEchartThemeRoma        = @"roma";
-PYEchartTheme const PYEchartThemeMint        = @"mint";
-PYEchartTheme const PYEchartThemeMacarons2   = @"macarons2";
-PYEchartTheme const PYEchartThemeSakura      = @"sakura";
-PYEchartTheme const PYEchartThemeDefault     = @"default";
-
-static NSString *const kEchartActionObtainImg = @"obtainImg";
-
 @interface PYEchartsView() {
     NSString *bundlePath;
     NSString *localHtmlContents;
@@ -60,6 +26,8 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
     
     PYEchartTheme _theme;
 }
+
+@property (nonatomic, assign) BOOL finishRender;
 
 @end
 
@@ -138,11 +106,10 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
     _divSize = CGSizeZero;
     minWidth = self.frame.size.width - 10;
     _scalable = NO;
-    
+    _finishRender = NO;
     
     _maxWidth = NSIntegerMax;
     actionHandleBlocks = [[NSMutableDictionary alloc] init];
-    
 }
 
 /**
@@ -182,10 +149,10 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
  *  Resize the main div in the `echarts.html`
  */
 - (void)resizeDiv {
-    float height = self.frame.size.height - 20;
+    float height = self.frame.size.height;
     float width = self.frame.size.width;
     if (!CGSizeEqualToSize(_divSize, CGSizeZero)) {
-        height = _divSize.height - 20;
+        height = _divSize.height;
         width = _divSize.width;
     } else {
         _divSize = CGSizeMake(width, height);
@@ -244,7 +211,7 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
  *
  *  @param name The echart event name
  */
-- (void)removeHandlerForAction:(NSString *)name {
+- (void)removeHandlerForAction:(PYEchartAction)name {
     [actionHandleBlocks removeObjectForKey:name];
     [self callJsMethods:[NSString stringWithFormat:@"removeEchartActionHandler(%@)",name]];
 }
@@ -297,32 +264,51 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
 #if TARGET_OS_IPHONE
 #pragma mark UIWebViewDelegate
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    if (option == nil) {
-        NSLog(@"Warning: The option is nil.");
-        [self callJsMethods:@"initEchartView()"];
-        return ;
-    }
-    [self resizeDiv];
-    
-    NSString *jsonStr = [PYJsonUtil getJSONString:option];
-    NSString *js;
-    PYLog(@"%@",jsonStr);
-   
-    if (_noDataLoadingOption != nil) {
-        PYLog(@"nodataLoadingOption:%@", [PYJsonUtil getJSONString:_noDataLoadingOption]);
-        NSString *noDataLoadingOptionString = [NSString stringWithFormat:@"{\"noDataLoadingOption\":%@ \n}", [PYJsonUtil getJSONString:_noDataLoadingOption]];
-        js = [NSString stringWithFormat:@"%@(%@, %@)", @"loadEcharts", jsonStr, noDataLoadingOptionString];
+    if ([[webView stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"]) {
+        // UIWebView object has fully loaded.
+        self.finishRender = YES;
+        if (option == nil) {
+            NSLog(@"Warning: The option is nil.");
+            [self callJsMethods:@"initEchartView()"];
+            return ;
+        }
+        
+        [self resizeDiv];
+        
+        NSString *jsonStr = [PYJsonUtil getJSONString:option];
+        NSString *js;
+        PYLog(@"%@",jsonStr);
+        
+        if (_noDataLoadingOption != nil) {
+            PYLog(@"nodataLoadingOption:%@", [PYJsonUtil getJSONString:_noDataLoadingOption]);
+            NSString *noDataLoadingOptionString = [NSString stringWithFormat:@"{\"noDataLoadingOption\":%@ \n}", [PYJsonUtil getJSONString:_noDataLoadingOption]];
+            js = [NSString stringWithFormat:@"%@(%@, %@)", @"loadEcharts", jsonStr, noDataLoadingOptionString];
+        } else {
+            js = [NSString stringWithFormat:@"%@(%@)", @"loadEcharts", jsonStr];
+        }
+        [webView stringByEvaluatingJavaScriptFromString:js];
+        [self setTheme:_theme];
+        for (NSString * name in actionHandleBlocks.allKeys) {
+            PYLog(@"%@", [NSString stringWithFormat:@"addEchartActionHandler('%@')",name]);
+            [self callJsMethods:[NSString stringWithFormat:@"addEchartActionHandler('%@')",name]];//
+        }
+        if (self.eDelegate && [self.eDelegate respondsToSelector:@selector(echartsViewDidFinishLoad:)]) {
+            [self.eDelegate echartsViewDidFinishLoad:self];
+        }
+        
+        // Disable user selection
+        [webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.style.webkitUserSelect='none';"];
+        
+        // Disable callout
+        [webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.style.webkitTouchCallout='none';"];
     } else {
-        js = [NSString stringWithFormat:@"%@(%@)", @"loadEcharts", jsonStr];
-    }
-    [webView stringByEvaluatingJavaScriptFromString:js];
-    [self setTheme:_theme];
-    for (NSString * name in actionHandleBlocks.allKeys) {
-        PYLog(@"%@", [NSString stringWithFormat:@"addEchartActionHandler('%@')",name]);
-        [self callJsMethods:[NSString stringWithFormat:@"addEchartActionHandler('%@')",name]];//
-    }
-    if (self.eDelegate && [self.eDelegate respondsToSelector:@selector(echartsViewDidFinishLoad:)]) {
-        [self.eDelegate echartsViewDidFinishLoad:self];
+        __weak __typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            __typeof(self) strongSelf = weakSelf;
+            if (!strongSelf.finishRender) {
+                [self loadEcharts];
+            }
+        });
     }
 }
 
@@ -335,7 +321,7 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *url = request.URL;
     PYLog(@"%@", url);
-    if ([[url.scheme lowercaseString] hasPrefix:@"http"]) { // Just open with the safari
+    if ([[url.scheme lowercaseString] hasPrefix:@"http"]) {
         if (_eDelegate != nil && [_eDelegate respondsToSelector:@selector(echartsView:didReceivedLinkURL:)]) {
             PYLog(@"Delegate will resolve the request!");
             return [_eDelegate echartsView:self didReceivedLinkURL:url];
@@ -389,37 +375,46 @@ static NSString *const kEchartActionObtainImg = @"obtainImg";
 }
 
 #elif TARGET_OS_MAC
-
 - (void)webView:(WebView *)webView didFinishLoadForFrame:(WebFrame *)frame {
-    if (option == nil) {
-        NSLog(@"Warning: The option is nil.");
-        [self callJsMethods:@"initEchartView()"];
-        return ;
-    }
-    [self resizeDiv];
-    
-    NSString *jsonStr = [PYJsonUtil getJSONString:option];
-    NSString *js;
-    PYLog(@"%@",jsonStr);
-    
-    if (_noDataLoadingOption != nil) {
-        PYLog(@"nodataLoadingOption:%@", [PYJsonUtil getJSONString:_noDataLoadingOption]);
-        NSString *noDataLoadingOptionString = [NSString stringWithFormat:@"{\"noDataLoadingOption\":%@ \n}", [PYJsonUtil getJSONString:_noDataLoadingOption]];
-        js = [NSString stringWithFormat:@"%@(%@, %@)", @"loadEcharts", jsonStr, noDataLoadingOptionString];
+    if ([[webView stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"]) {
+        if (option == nil) {
+            NSLog(@"Warning: The option is nil.");
+            [self callJsMethods:@"initEchartView()"];
+            return ;
+        }
+        [self resizeDiv];
+        
+        NSString *jsonStr = [PYJsonUtil getJSONString:option];
+        NSString *js;
+        PYLog(@"%@",jsonStr);
+        
+        if (_noDataLoadingOption != nil) {
+            PYLog(@"nodataLoadingOption:%@", [PYJsonUtil getJSONString:_noDataLoadingOption]);
+            NSString *noDataLoadingOptionString = [NSString stringWithFormat:@"{\"noDataLoadingOption\":%@ \n}", [PYJsonUtil getJSONString:_noDataLoadingOption]];
+            js = [NSString stringWithFormat:@"%@(%@, %@)", @"loadEcharts", jsonStr, noDataLoadingOptionString];
+        } else {
+            js = [NSString stringWithFormat:@"%@(%@)", @"loadEcharts", jsonStr];
+        }
+        //    //    [webView stringByEvaluatingJavaScriptFromString:js];
+        //    [[webView windowScriptObject] evaluateWebScript:@"alert('123')"];
+        //    [[webView windowScriptObject] callWebScriptMethod:@"alert" withArguments:@[@"234"]];
+        [[webView windowScriptObject] evaluateWebScript:js];
+        
+        for (NSString * name in actionHandleBlocks.allKeys) {
+            PYLog(@"%@", [NSString stringWithFormat:@"addEchartActionHandler('%@')",name]);
+            [self callJsMethods:[NSString stringWithFormat:@"addEchartActionHandler('%@')",name]];//
+        }
+        if (self.eDelegate && [self.eDelegate respondsToSelector:@selector(echartsViewDidFinishLoad:)]) {
+            [self.eDelegate echartsViewDidFinishLoad:self];
+        }
     } else {
-        js = [NSString stringWithFormat:@"%@(%@)", @"loadEcharts", jsonStr];
-    }
-//    //    [webView stringByEvaluatingJavaScriptFromString:js];
-//    [[webView windowScriptObject] evaluateWebScript:@"alert('123')"];
-//    [[webView windowScriptObject] callWebScriptMethod:@"alert" withArguments:@[@"234"]];
-    [[webView windowScriptObject] evaluateWebScript:js];
-    
-    for (NSString * name in actionHandleBlocks.allKeys) {
-        PYLog(@"%@", [NSString stringWithFormat:@"addEchartActionHandler('%@')",name]);
-        [self callJsMethods:[NSString stringWithFormat:@"addEchartActionHandler('%@')",name]];//
-    }
-    if (self.eDelegate && [self.eDelegate respondsToSelector:@selector(echartsViewDidFinishLoad:)]) {
-        [self.eDelegate echartsViewDidFinishLoad:self];
+        __weak __typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            __typeof(self) strongSelf = weakSelf;
+            if (!strongSelf.finishRender) {
+                [self loadEcharts];
+            }
+        });
     }
 }
 

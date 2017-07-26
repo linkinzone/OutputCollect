@@ -29,9 +29,8 @@ static NSArray<PYPolarType> *polarTypeScope;
     self = [super init];
     if (self) {
         _center = [[NSMutableArray alloc] initWithArray:@[@"50%", @"50%"]];
-        _radius = @(0.75);
         _startAngle = @(90);
-        _spliteNumber = @(5);
+        _splitNumber = @(5);
         _name = @{@"show":@(YES), @"textStyle":@{@"color":@"#333"}};
         _scale = NO;
         _type = PYPolarTypePolygon;
@@ -66,16 +65,16 @@ PYInitializerImpTemplate(PYPolar);
 PYPropertyEqualImpTemplate(PYPolar, NSNumber *, zlevel);
 PYPropertyEqualImpTemplate(PYPolar, NSNumber *, z);
 PYPropertyEqualImpTemplate(PYPolar, NSMutableArray *, center);
-PYPropertyEqualImpTemplate(PYPolar, NSNumber *, radius);
+PYPropertyEqualImpTemplate(PYPolar, id, radius);
 PYPropertyEqualImpTemplate(PYPolar, NSNumber *, startAngle);
-PYPropertyEqualImpTemplate(PYPolar, NSNumber *, spliteNumber);
+PYPropertyEqualImpTemplate(PYPolar, NSNumber *, splitNumber);
 PYPropertyEqualImpTemplate(PYPolar, id, name);
 PYPropertyEqualImpTemplate(PYPolar, NSMutableArray *, boundaryGap);
 PYPropertyEqualImpTemplate(PYPolar, BOOL, scale);
 PYPropertyEqualImpTemplate(PYPolar, PYLineStyle *, axisLine);
 PYPropertyEqualImpTemplate(PYPolar, PYAxisLabel *, axisLabel);
-PYPropertyEqualImpTemplate(PYPolar, PYLineStyle *, spliteLine);
-PYPropertyEqualImpTemplate(PYPolar, PYAreaStyle *, spliteArea);
+PYPropertyEqualImpTemplate(PYPolar, PYLineStyle *, splitLine);
+PYPropertyEqualImpTemplate(PYPolar, PYAreaStyle *, splitArea);
 PYPropertyEqualImpTemplate(PYPolar, NSMutableArray *, indicator);
 
 @end

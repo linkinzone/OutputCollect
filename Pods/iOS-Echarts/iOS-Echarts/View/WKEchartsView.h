@@ -1,14 +1,15 @@
 //
-//  PYEchartsView.h
+//  WKEchartsView.h
 //  iOS-Echarts
 //
-//  Created by Pluto Y on 15/9/4.
-//  Copyright (c) 2015年 Pluto Y. All rights reserved.
+//  Created by Pluto-Y on 30/12/2016.
+//  Copyright © 2016 pluto-y. All rights reserved.
 //
 
-@class PYEchartsView;
+#import <WebKit/WebKit.h>
+@class WKEchartsView;
 
-@protocol PYEchartsViewDelegate <NSObject>
+@protocol WKEchartsViewDelegate <NSObject>
 
 @optional
 /**
@@ -21,31 +22,25 @@
  *
  *  @return The same as the description
  */
-- (BOOL)echartsView:(PYEchartsView *)echartsView didReceivedLinkURL:(NSURL *)url;
+- (BOOL)echartsView:(WKEchartsView *)echartsView didReceivedLinkURL:(NSURL *)url;
 
 /**
  *  When the options are loaded complete, this method will be called for user
  *
  *  @param echartsView The echatsView provide this action
  */
-- (void)echartsViewDidFinishLoad:(PYEchartsView *)echartsView;
+- (void)echartsViewDidFinishLoad:(WKEchartsView *)echartsView;
 @end
 
 @class PYOption, PYLoadingOption, PYNoDataLoadingOption;
 
-@interface PYEchartsView : PY_WEB_VIEW<PY_WEB_DELEGATE> {
-    PYOption *option;
-}
+@interface WKEchartsView : WKWebView<WKNavigationDelegate, WKUIDelegate>
 
-@property (nonatomic, assign) PY_EDGE_INSET padding;
 @property (nonatomic, assign) CGSize divSize;
-@property (nonatomic, assign) CGFloat maxWidth;
-@property (nonatomic, assign) BOOL scalable;
-
-@property (nonatomic, weak) id<PYEchartsViewDelegate> eDelegate;
 
 // You should set this property before `loadEcharts`, or it will be useless
 @property (nonatomic, strong) PYNoDataLoadingOption *noDataLoadingOption;
+@property (nonatomic, weak) id<WKEchartsViewDelegate> eDelegate;
 
 /**
  *  Resize the main div in the `echarts.html`
@@ -53,19 +48,13 @@
 - (void)resizeDiv;
 
 /**
- *  Load echart
+ *  Refresh echarts not re-load echarts
+ *  The option is the last option you had set
  */
-- (void)loadEcharts;
+- (void)refreshEcharts;
 
 /**
- *  Set the option for Echarts
- *
- *  @param option The option of EChart
- */
-- (void)setOption:(PYOption *)pyOption;
-
-/**
- *  Refresh echar with the option
+ *  Refresh echart with the option
  *  You can call this method for refreshing not re-load the echart
  *
  *  @param newOption EChart's option
@@ -81,25 +70,12 @@
 - (void)setTheme:(PYEchartTheme) theme;
 
 /**
- *  Refresh echarts not re-load echarts
- *  The option is the last option you had set
- */
-- (void)refreshEcharts;
-
-/**
- *  Call the js method
- *
- *  @param methodWithParam The format:`[instance.]methodname(params)`
- */
-- (void)callJsMethods:(NSString *)methodWithParam;
-
-/**
  *  Add the echart action handler
  *
  *  @param name  The echart event name
  *  @param block The block handler
  */
--(void)addHandlerForAction:(PYEchartAction)name withBlock:(PYEchartActionHandler)block;
+- (void)addHandlerForAction:(PYEchartAction)name withBlock:(PYEchartActionHandler)block;
 
 /**
  *  Remove the echart action hander
@@ -115,6 +91,18 @@
  *  @param completedBlock A block called when get the image from echarts.
  */
 - (void)obtainEchartsImageWithType:(PYEchartsViewImageType)type completed:(void(^)(PY_IMAGE *image))completedBlock;
+
+/**
+ *  Load echart
+ */
+- (void)loadEcharts;
+
+/**
+ *  Set the option for echart
+ *
+ *  @param pyOption The echart option
+ */
+- (void)setOption:(PYOption *)pyOption;
 
 /**
  *  Option for the loading screen, show a loading label text.

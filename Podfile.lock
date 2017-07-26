@@ -1,15 +1,15 @@
 PODS:
-  - iOS-Echarts (1.3.4)
+  - iOS-Echarts (1.4.4)
   - Masonry (1.0.2)
 
 DEPENDENCIES:
-  - iOS-Echarts
+  - iOS-Echarts (~> 1.4.4)
   - Masonry (~> 1.0.2)
 
 SPEC CHECKSUMS:
-  iOS-Echarts: 459536bb2d7fda357f0a295f40ccd9c685807ff4
+  iOS-Echarts: dbc7423d861e5eedee78906a39d205b5c4da9a13
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
 
-PODFILE CHECKSUM: 697bcdfdc976e6ee4489554aa54e2c17abe4688c
+PODFILE CHECKSUM: 838de620daeb7ae96c5155ff0cac184e260afc5c
 
-COCOAPODS: 1.2.0.beta.1
+COCOAPODS: 1.2.1

@@ -41,42 +41,79 @@ static NSString *PYAuto = @"auto";
 static NSString *PYNone = @"none";
 
 typedef NSString *PYInterval;
-static PYInterval PYIntervalAuto = @"auto";
-static PYInterval PYIntervalAll  = @"all";
+static PYInterval const PYIntervalAuto = @"auto";
+static PYInterval const PYIntervalAll  = @"all";
 
 typedef NSString *PYSymbol;
-static PYSymbol PYSymbolNone           = @"none";
-static PYSymbol PYSymbolCircle         = @"circle";
-static PYSymbol PYSymbolRectangle      = @"rectangle";
-static PYSymbol PYSymbolTriangle       = @"triangle";
-static PYSymbol PYSymbolDiamond        = @"diamond";
-static PYSymbol PYSymbolEmptyCircle    = @"emptyCircle";
-static PYSymbol PYSymbolEmptyRectangle = @"emptyRectangle";
-static PYSymbol PYSymbolEmptyTriangle  = @"emptyTriangle";
-static PYSymbol PYSymbolEmptyDiamond   = @"emptyDiamond";
-static PYSymbol PYSymbolHeart          = @"heart";
-static PYSymbol PYSymbolDroplet        = @"droplet";
-static PYSymbol PYSymbolPin            = @"pin";
-static PYSymbol PYSymbolArrow          = @"arrow";
-static PYSymbol PYSymbolStar5          = @"star5";
+static PYSymbol const PYSymbolNone           = @"none";
+static PYSymbol const PYSymbolCircle         = @"circle";
+static PYSymbol const PYSymbolRectangle      = @"rectangle";
+static PYSymbol const PYSymbolTriangle       = @"triangle";
+static PYSymbol const PYSymbolDiamond        = @"diamond";
+static PYSymbol const PYSymbolEmptyCircle    = @"emptyCircle";
+static PYSymbol const PYSymbolEmptyRectangle = @"emptyRectangle";
+static PYSymbol const PYSymbolEmptyTriangle  = @"emptyTriangle";
+static PYSymbol const PYSymbolEmptyDiamond   = @"emptyDiamond";
+static PYSymbol const PYSymbolHeart          = @"heart";
+static PYSymbol const PYSymbolDroplet        = @"droplet";
+static PYSymbol const PYSymbolPin            = @"pin";
+static PYSymbol const PYSymbolArrow          = @"arrow";
+static PYSymbol const PYSymbolStar5          = @"star5";
 
 typedef NSString *PYSort;
-static PYSort PYSortNone       = @"none";
-static PYSort PYSortAscending  = @"ascending";
-static PYSort PYSortDescending = @"descending";
+static PYSort const PYSortNone       = @"none";
+static PYSort const PYSortAscending  = @"ascending";
+static PYSort const PYSortDescending = @"descending";
 
 typedef NSString *PYPosition;
-static PYPosition PYPositionLeft   = @"left";
-static PYPosition PYPositionRight  = @"right";
-static PYPosition PYPositionCenter = @"center";
-static PYPosition PYPositionTop    = @"top";
-static PYPosition PYPositionBottom = @"bottom";
+static PYPosition const PYPositionLeft   = @"left";
+static PYPosition const PYPositionRight  = @"right";
+static PYPosition const PYPositionCenter = @"center";
+static PYPosition const PYPositionTop    = @"top";
+static PYPosition const PYPositionBottom = @"bottom";
 
 typedef NSString *PYOrient;
-static PYOrient PYOrientHorizontal = @"horizontal";
-static PYOrient PYOrientVertical   = @"vertical";
+static PYOrient const PYOrientHorizontal = @"horizontal";
+static PYOrient const PYOrientVertical   = @"vertical";
 
+typedef NSString * PYEchartTheme;
+static PYEchartTheme const PYEchartThemeMacarons    = @"macarons";
+static PYEchartTheme const PYEchartThemeInfographic = @"infographic";
+static PYEchartTheme const PYEchartThemeShine       = @"shine";
+static PYEchartTheme const PYEchartThemeDark        = @"dark";
+static PYEchartTheme const PYEchartThemeBlue        = @"blue";
+static PYEchartTheme const PYEchartThemeGreen       = @"green";
+static PYEchartTheme const PYEchartThemeRed         = @"red";
+static PYEchartTheme const PYEchartThemeGray        = @"gray";
+static PYEchartTheme const PYEchartThemeHelianthus  = @"helianthus";
+static PYEchartTheme const PYEchartThemeRoma        = @"roma";
+static PYEchartTheme const PYEchartThemeMint        = @"mint";
+static PYEchartTheme const PYEchartThemeMacarons2   = @"macarons2";
+static PYEchartTheme const PYEchartThemeSakura      = @"sakura";
+static PYEchartTheme const PYEchartThemeDefault     = @"default";
 
+typedef void (^PYEchartActionHandler) (NSDictionary *params);
+
+typedef NSString *PYEchartAction;
+static PYEchartAction const PYEchartActionResize          = @"resize";
+static PYEchartAction const PYEchartActionClick           = @"click";
+static PYEchartAction const PYEchartActionDbClick         = @"dblclick";
+static PYEchartAction const PYEchartActionDataChanged     = @"dataChanged";
+static PYEchartAction const PYEchartActionDataZoom        = @"dataZoom";
+static PYEchartAction const PYEchartActionDataRange       = @"dataRange";
+static PYEchartAction const PYEchartActionLegendSelected  = @"legendSelected";
+static PYEchartAction const PYEchartActionMapSelected     = @"mapSelected";
+static PYEchartAction const PYEchartActionPieSelected     = @"pieSelected";
+static PYEchartAction const PYEchartActionMagicTypeChange = @"magicTypeChanged";
+static PYEchartAction const PYEchartActionDataViewChanged = @"dataViewChanged";
+static PYEchartAction const PYEchartActionTimelineChanged = @"timelineChanged";
+static PYEchartAction const PYEchartActionMapRoam         = @"mapRoam";
+
+typedef NSString *PYEchartsViewImageType;
+static PYEchartsViewImageType const PYEchartsViewImageTypeJEPG = @"jpeg";
+static PYEchartsViewImageType const PYEchartsViewImageTypePNG = @"png";
+
+static NSString *const kEchartActionObtainImg = @"obtainImg";
 
 #pragma mark - The template marco
 

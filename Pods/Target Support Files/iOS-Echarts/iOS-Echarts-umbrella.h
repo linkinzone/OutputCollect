@@ -66,6 +66,7 @@
 #import "PYJsonUtil.h"
 #import "PYEchartsView.h"
 #import "PYZoomEchartsView.h"
+#import "WKEchartsView.h"
 
 FOUNDATION_EXPORT double iOS_EchartsVersionNumber;
 FOUNDATION_EXPORT const unsigned char iOS_EchartsVersionString[];

@@ -44,9 +44,15 @@
     var myChart;
     var ecConfig;
     function echartViewAction(param) {
-//        alert(JSON.stringify(param));
+        // alert(JSON.stringify(param));
+        // alert(window.webkit);
+        if(window.webkit == undefined) {
+            window.parent.frames['action_frame'].location.href = 'pyEchartAction://' + param.type + '#' + JSON.stringify(param) + ''; // Support for UIWebView
+            
+        } else {
+            eval("window.webkit.messageHandlers." + param.type + ".postMessage(" + JSON.stringify(param) + ")"); // Support for WKWebView
+        }
         //document.location.href = 'pyEchartAction://' + param.type + '#' + JSON.stringify(param) + '';
-        window.parent.frames['action_frame'].location.href = 'pyEchartAction://' + param.type + '#' + JSON.stringify(param) + '';
     }
     function preTask(obj) {
         var result;
@@ -106,7 +112,12 @@
         //alert("type:" + type);
         var result = myChart.getDataURL(type);
         //alert('result:'+result);
-        document.location.href = 'pyEchartAction://obtainImg#' + result + '';
+        //document.location.href = 'pyEchartAction://obtainImg#' + result + '';
+        if(window.webkit == undefined) {
+            window.parent.frames['action_frame'].location.href = 'pyEchartAction://obtainImg#' + result + ''; // Support for UIWebView
+        } else {
+            window.webkit.messageHandlers.obtainImg.postMessage(result); // Support for WKWebView
+        }
     }
     function initEchartView(initParams) {
         // 基于准备好的dom，初始化echarts图表
@@ -125,11 +136,15 @@
         myChart.un(name, echartViewAction);
     }
     function changeDataZoomRange(start, end) {
+        option = myChart.getOption();
+        option.dataZoom.start = start;
+        option.dataZoom.end = end;
         myChart.component.dataZoom.absoluteZoom({'start':start, 'end': end});
+        myChart.setOption(option, true);
     }
     </script>
 </head>
-<body style="background-color: transparent"><!-- transparent-->
+<body style="background-color: transparent;margin:0px"><!-- transparent-->
     <iframe name="action_frame" src="" style="display:none;"></iframe>
     <div id="main" style="height:270px;width:420px;" ></div><!-- style="height:270px;width:420px;margin-left:-30px;"-->
 </body>

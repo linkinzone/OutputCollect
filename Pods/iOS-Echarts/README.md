@@ -5,7 +5,9 @@
 
 ____
 
-This is a highly custom chart control for iOS and Mac apps, which build with the EChart(Echart2). It just encapsulate the conrol of the javascript. It provides a chainable way of describing your configurations for the echarts.  It's convinient for foucing on the logic of the app and optimizing the code. It avoid diverting developers' mind on the interaction between javascript and Objective-C.
+This is a highly custom chart control for iOS and Mac apps, which build with the Echart(Echart2). It just encapsulate the conrol of the javascript. It provides a chainable way of describing your configurations for the echarts.  It's convinient for foucing on the logic of the app and optimizing the code. It avoid diverting developers' mind on the interaction between javascript and Objective-C.
+
+> Tips: If you want to use even iOS8.0, I suggest you use `WKEchartsView` which is based on `WKWebView`. The interface of `WKEchartsView` is same as `PYEchartsView`, so if you are using `PYEchartsView`, you just change `PYEchartsView` into `WKEchartsView`.
 
 If you like this control, please star it. It can make me pay more attention on it.
 
@@ -33,9 +35,9 @@ There are two ways to use iOS-Echarts in you project:
 * Manually:
     * First, copying all the files into you project
     * Second, `Remove references`the directory named 'js'
-    * Finnaly, add the directory named 'js' by `create floder references`
+    * Finnaly, add the directory named 'js' and 'theme' by `create floder references`
 
-*** Please Be Sure The Color Of `js` Directory Is Blue. ***
+⚠️  *** Please Be Sure The Color Of `js` and `theme` Directory Is Blue. *** ⚠️  
 
 You should import one header file in your project:`iOS-Echarts.h` when you will use it.
 Finally you just need to initialze the PYEchartsView and PYOption you need. 
@@ -105,12 +107,12 @@ option.addXAxis(//Something about PYAxis)
 
 ```
 .addSeries([PYCartesianSeries initPYCartesianSeriesWithBlock:^(PYCartesianSeries *series) {
-    series.stackEqual(@"总量")
+    series.stackEqual(@"Total")
     .smoothEqual(YES)
     .symbolEqual(PYSymbolArrow)
     .symbolSizeEqual(@6)
     .symbolRotateEqual(@(-45))
-    .nameEqual(@"直接访问")
+    .nameEqual(@"Data1")
     .typeEqual(PYSeriesTypeLine)
     .itemStyleEqual([PYItemStyle initPYItemStyleWithBlock:^(PYItemStyle *itemStyle) {
         itemStyle.normalEqual([PYItemStyleProp initPYItemStylePropWithBlock:^(PYItemStyleProp *normal) {
@@ -160,4 +162,3 @@ If you have QQ, you can join the group which number is 485591970.
 ___
 
 All source code is licensed under the MIT License.
-
