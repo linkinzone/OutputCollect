@@ -1,24 +1,17 @@
 //
-//  ViewController.m
+//  IndexController.m
 //  OutputCollect
 //
-//  Created by afro on 2017/7/25.
+//  Created by afro on 2017/7/28.
 //  Copyright © 2017年 afro. All rights reserved.
 //
 
-//define this constant if you want to use Masonry without the 'mas_' prefix
-#define MAS_SHORTHAND
-
-//define this constant if you want to enable auto-boxing for default syntax
-#define MAS_SHORTHAND_GLOBALS
-
-#import "ViewController.h"
+#import "IndexController.h"
 #import "iOS-Echarts.h"
-#import "Masonry.h"
+#import "Fab2OutputController.h"
+#import "Macros.h"
 
-@interface ViewController ()
-
-@property(nonatomic, strong)UIScrollView *scrollView;
+@interface IndexController ()<UIScrollViewDelegate>
 
 @property(nonatomic, strong)UIView *contentView;
 
@@ -34,18 +27,12 @@
 // 电性能
 @property(nonatomic, strong)PYZoomEchartsView *electricalPropertyCTView;
 
+//自定义导航栏视图
+@property (nonatomic, strong) UIView * naviView;
+
 @end
 
-@implementation ViewController
-
-- (UIScrollView *)scrollView {
-    if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] init];
-        _scrollView.contentSize = CGSizeMake(0, 1500);
-        [self.view addSubview:_scrollView];
-    }
-    return _scrollView;
-}
+@implementation IndexController
 
 - (PYZoomEchartsView *)capitalOutputRatioCTView {
     if (!_capitalOutputRatioCTView) {
@@ -75,62 +62,119 @@
     return _electricalPropertyCTView;
 }
 
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.title = @"首页";
     [self setupUI];
+
+    self.naviView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 64)];
+    [self.view addSubview:self.naviView];
+    [self.view bringSubviewToFront:self.naviView];
     
-    [self.capitalOutputRatioCTView setOption:[self setupCapitalOutputRatioOption]];
-    [self.capitalOutputRatioCTView loadEcharts];
     
-    [self.outputCTView setOption:[self setupOutputOption]];
-    [self.outputCTView loadEcharts];
-    
-    [self.efficiencyCTView setOption:[self setupEfficiencyOption]];
-    [self.efficiencyCTView loadEcharts];
-    
-    [self.electricalPropertyCTView setOption:[self setupElectricalPropertyOption]];
-    [self.electricalPropertyCTView loadEcharts];
+//    [self.capitalOutputRatioCTView setOption:[self setupCapitalOutputRatioOption]];
+//    [self.capitalOutputRatioCTView loadEcharts];
+//    
+//    [self.outputCTView setOption:[self setupOutputOption]];
+//    [self.outputCTView loadEcharts];
+//    
+//    [self.efficiencyCTView setOption:[self setupEfficiencyOption]];
+//    [self.efficiencyCTView loadEcharts];
+//    
+//    [self.electricalPropertyCTView setOption:[self setupElectricalPropertyOption]];
+//    [self.electricalPropertyCTView loadEcharts];
 }
 
 - (void)setupUI {
-    [self.scrollView makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.width.equalTo(self.view);
+    self.baseScrollView.backgroundColor = kRandomColor;
+    self.baseScrollView.delegate = self;
+    [self.baseScrollView makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.width.height.equalTo(self.view);
     }];
     
     self.contentView = [[UIView alloc] init];
-    [self.scrollView addSubview:self.contentView];
+    [self.baseScrollView addSubview:self.contentView];
     [self.contentView makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.width.equalTo(self.scrollView);
+        make.top.left.width.equalTo(self.baseScrollView);
     }];
     
-    [self.contentView addSubview:self.capitalOutputRatioCTView];
-    [self.capitalOutputRatioCTView makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.contentView).offset(64);
-        make.left.right.width.equalTo(self.contentView);
-        make.height.equalTo(300);
+    UIButton *btn1 = [[UIButton alloc] init];
+    [btn1 addTarget:self action:@selector(btn1Click) forControlEvents:UIControlEventTouchUpInside];
+    [btn1 setTitle:@"跳转" forState:UIControlStateNormal];
+    [btn1 setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    [self.contentView addSubview:btn1];
+    [btn1 makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.contentView).offset(300);
+        make.width.height.equalTo(100);
     }];
     
-    [self.contentView addSubview:self.outputCTView];
-    [self.outputCTView makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.capitalOutputRatioCTView.bottom).offset(64);
-        make.left.right.width.equalTo(self.contentView);
-        make.height.equalTo(300);
+    [self.contentView makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(btn1).offset(1500);
     }];
     
-    [self.contentView addSubview:self.efficiencyCTView];
-    [self.efficiencyCTView makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.outputCTView.bottom).offset(64);
-        make.left.right.width.equalTo(self.contentView);
-        make.height.equalTo(300);
+    [self.baseScrollView makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.contentView);
     }];
     
-    [self.contentView addSubview:self.electricalPropertyCTView];
-    [self.electricalPropertyCTView makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.efficiencyCTView.bottom).offset(64);
-        make.left.right.width.bottom.equalTo(self.contentView);
-        make.height.equalTo(300);
-    }];
+//    [self.contentView addSubview:self.capitalOutputRatioCTView];
+//    [self.capitalOutputRatioCTView makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.contentView).offset(20);
+//        make.left.right.width.equalTo(self.contentView);
+//        make.height.equalTo(300);
+//    }];
+//    
+//    [self.contentView addSubview:self.outputCTView];
+//    [self.outputCTView makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.capitalOutputRatioCTView.bottom).offset(64);
+//        make.left.right.width.equalTo(self.contentView);
+//        make.height.equalTo(300);
+//    }];
+//    
+//    [self.contentView addSubview:self.efficiencyCTView];
+//    [self.efficiencyCTView makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.outputCTView.bottom).offset(64);
+//        make.left.right.width.equalTo(self.contentView);
+//        make.height.equalTo(300);
+//    }];
+//    
+//    [self.contentView addSubview:self.electricalPropertyCTView];
+//    [self.electricalPropertyCTView makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.efficiencyCTView.bottom).offset(64);
+//        make.left.right.width.bottom.equalTo(self.contentView);
+//        make.height.equalTo(300);
+//    }];
+}
+
+- (void)btn1Click {
+    Fab2OutputController *fab2 = [[Fab2OutputController alloc] init];
+    [fab2 setHidesBottomBarWhenPushed:YES];
+    [self.navigationController pushViewController:fab2 animated:YES];
+}
+
+#pragma mark - scrollViewDelegate
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    CGFloat alpha = scrollView.contentOffset.y / 200;
+    if (alpha >= 1) {
+        alpha = 1;
+    }else if (alpha <= 0)
+    {
+        alpha = 0;
+    }
+    self.naviView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:alpha];
 }
 
 - (PYOption *)setupCapitalOutputRatioOption {
@@ -143,7 +187,7 @@
             
         }])
         .gridEqual([PYGrid initPYGridWithBlock:^(PYGrid *grid) {                // 设置网格
-            grid.xEqual(@40).x2Equal(@90).yEqual(@50);
+            grid.xEqual(@50).x2Equal(@90).yEqual(@50);
         }])
         .tooltipEqual([PYTooltip initPYTooltipWithBlock:^(PYTooltip *tooltip) { // 设置提示
             tooltip.triggerEqual(PYTooltipTriggerAxis)
@@ -518,5 +562,6 @@
         }]);
     }];
 }
+
 
 @end
